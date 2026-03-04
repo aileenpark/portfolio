@@ -1,0 +1,133 @@
+/* ─────────────────────────────────────────────────────────────
+   Hero Section
+   Figma frame reference: 1440 × 960px
+   ───────────────────────────────────────────────────────────── */
+
+.hero {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  z-index: 10;
+  /* Clip horizontal overflow (headline is 1920px wide) without
+     creating a scroll container — keeps headline visible at edges */
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* ── Intro text ─────────────────────────────────────────────── */
+/* Figma: right ≈ 74px  top: 612px (in 960px frame → bottom ≈ 32.2%) */
+
+.hero-intro {
+  position: absolute;
+  right: 74px;
+  bottom: 32.29%; /* (960 - 612 - 39) / 960 */
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #121212;
+}
+
+.hero-intro p {
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ── Headline ───────────────────────────────────────────────── */
+/* Figma: width: 1920px, height: 102.5px, top: 712px
+          → bottom: (960 - 712 - 103) / 960 ≈ 15.1%
+          centered: left 50% translateX(-50%)                    */
+
+.hero-headline {
+  position: absolute;
+  bottom: 15.1%;
+  left: 50%;
+  transform: translateX(-50%);
+  /* 1920px / 1440px = 133.33vw — overflows 240px on each side */
+  width: 133.33vw;
+}
+
+.hero-headline svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Copyright ──────────────────────────────────────────────── */
+/* Figma: left: 74px, top: 844px → bottom ≈ 10% in 960px frame */
+
+.hero-copyright {
+  position: absolute;
+  left: 74px;
+  bottom: 10%;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #121212;
+  white-space: nowrap;
+}
+
+/* ── Tablet ≤ 1200px ────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .hero-headline {
+    width: 180vw;
+  }
+
+  .hero-intro {
+    right: 40px;
+  }
+
+  .hero-copyright {
+    left: 40px;
+  }
+}
+
+/* ── Tablet ≤ 768px ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero-headline {
+    width: 260vw;
+    bottom: 18%;
+  }
+
+  .hero-intro {
+    right: 24px;
+    bottom: 35%;
+    font-size: 13px;
+  }
+
+  .hero-intro p {
+    white-space: normal;
+    max-width: 200px;
+    text-align: right;
+  }
+
+  .hero-copyright {
+    left: 24px;
+    font-size: 13px;
+  }
+}
+
+/* ── Mobile ≤ 375px ─────────────────────────────────────────── */
+@media (max-width: 375px) {
+  .hero-headline {
+    width: 320vw;
+    bottom: 20%;
+  }
+
+  .hero-intro {
+    right: 20px;
+    bottom: 38%;
+    font-size: 12px;
+  }
+
+  .hero-intro p {
+    max-width: 160px;
+  }
+
+  .hero-copyright {
+    left: 20px;
+    font-size: 12px;
+  }
+}

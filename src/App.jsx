@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import Header from "./components/Header";
+import Hero from "./components/Hero";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 
@@ -1278,6 +1279,8 @@ export default function App() {
       }}
     >
       <Header />
+
+      <Hero />
 
       {/* WebGL layer */}
       <div
