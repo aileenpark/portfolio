@@ -1280,8 +1280,6 @@ export default function App() {
     >
       <Header />
 
-      <Hero />
-
       {/* WebGL layer */}
       <div
         style={{
@@ -1319,6 +1317,8 @@ export default function App() {
         {/* Glass Cube */}
         <GlassCube />
       </div>
+
+      <Hero />
 
       {/* Fallback UI */}
       {webglFallback && (
