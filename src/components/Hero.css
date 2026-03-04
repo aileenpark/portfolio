@@ -32,25 +32,19 @@
 }
 
 /* ── Headline ───────────────────────────────────────────────── */
-/* Figma: width: 1920px, height: 102.5px, top: 712px
-          → bottom: (960 - 712 - 103) / 960 ≈ 15.1%
-          centered: left 50% translateX(-50%)                    */
+/* Figma: width 1920px, height 102.5px, centered, top 712px
+   → bottom: (960 - 712 - 103) / 960 ≈ 15.1%
+   height = calc(100vw * 103 / 1920) preserves viewBox aspect ratio
+   without relying on aspect-ratio or height:auto in absolute context  */
 
 .hero-headline {
   position: absolute;
   bottom: 15.1%;
-  left: 50%;
-  transform: translateX(-50%);
-  /* 1920 / 1440 = 133.33vw — overflows 240px on each side at desktop */
-  width: 133.33vw;
-  /* Force correct height: SVG viewBox ratio 1920:103 */
-  aspect-ratio: 1920 / 103;
-}
-
-.hero-headline svg {
+  left: 0;
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: calc(100vw * 103 / 1920);
+  overflow: visible;
 }
 
 /* ── Copyright ──────────────────────────────────────────────── */
@@ -87,7 +81,8 @@
 /* ── Tablet ≤ 768px ─────────────────────────────────────────── */
 @media (max-width: 768px) {
   .hero-headline {
-    width: 260vw;
+    width: 100vw;
+    height: calc(100vw * 103 / 1920);
     bottom: 18%;
   }
 
@@ -112,7 +107,8 @@
 /* ── Mobile ≤ 375px ─────────────────────────────────────────── */
 @media (max-width: 375px) {
   .hero-headline {
-    width: 320vw;
+    width: 100vw;
+    height: calc(100vw * 103 / 1920);
     bottom: 20%;
   }
 
