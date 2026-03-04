@@ -94,6 +94,9 @@ function LiquidEther({
         el.style.width = "100%";
         el.style.height = "100%";
         el.style.display = "block";
+        el.style.position = "absolute";
+        el.style.top = "0";
+        el.style.left = "0";
 
         el.addEventListener(
           "webglcontextlost",
