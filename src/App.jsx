@@ -401,7 +401,7 @@ function LiquidEther({
             vertexShader: fv,
             fragmentShader: af,
             uniforms: {
-              boundarySpace: { value: s.cellScale },
+              boundarySpace: { value: s.boundarySpace },
               px: { value: s.cellScale },
               fboSize: { value: s.fboSize },
               velocity: { value: s.src.texture },
@@ -1356,7 +1356,7 @@ export default function App() {
         <div
           style={{
             position: "absolute",
-            inset: "-1px", // 가장자리 픽셀 손실 방지 위해 -1px 여유
+            inset: "0",
             zIndex: 0,
             pointerEvents: "all",
           }}
