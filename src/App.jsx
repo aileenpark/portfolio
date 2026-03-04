@@ -196,15 +196,17 @@ function GlassCube() {
       clearcoatRoughness:        0,
       envMapIntensity:           2,
       transparent:               true,
+      opacity:                   0.65, // 투명도 강화 (기본 1.0 -> 0.65)
     });
     const cube = new THREE.Mesh(cubeGeo, cubeMat);
+    cube.scale.set(1.1, 1.1, 1.1); // 크기 10% 증가
     scene.add(cube);
 
     /* ── Inner geometry ──────────────────────────────── */
     const innerGeo = new THREE.OctahedronGeometry(0.52, 2);
     const innerMat = new THREE.MeshPhysicalMaterial({
       color:                     0xddc8ff,
-      transmission:              0.7,
+      transmission:              0.9,  // 투과율 증가 (기본 0.7 -> 0.9)
       thickness:                 1,
       roughness:                 0.06,
       metalness:                 0.0,
@@ -216,9 +218,10 @@ function GlassCube() {
       clearcoatRoughness:        0,
       envMapIntensity:           2.5,
       transparent:               true,
-      opacity:                   0.9,
+      opacity:                   0.6,  // 내부 투명도 강화 (기본 0.9 -> 0.6)
     });
     const inner = new THREE.Mesh(innerGeo, innerMat);
+    inner.scale.set(1.1, 1.1, 1.1); // 크기 10% 증가
     scene.add(inner);
 
     /* ── Rainbow PointLights ─────────────────────────── */
@@ -331,11 +334,11 @@ function GlassCube() {
       ref={mountRef}
       style={{
         position: 'absolute',
-        top: '50%', left: '50%',
+        top: '71.8%', left: '78.1%',
         transform: 'translate(-50%, -50%)',
         zIndex: 1,
         pointerEvents: 'none',
-        width: 560, height: 560,
+        width: 616, height: 616, // 크기 10% 증가에 맞춰 컨테이너 사이즈 확장 (560 -> 616)
       }}
     />
   );
