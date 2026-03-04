@@ -808,6 +808,10 @@ function LiquidEther({
       resize() {
         Common.resize();
         this.output.resize();
+        if (Common.renderer) {
+          Common.renderer.domElement.style.cssText =
+            "position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; display: block !important;";
+        }
       }
       render() {
         if (this.autoDriver) this.autoDriver.update();
@@ -863,6 +867,11 @@ function LiquidEther({
 
     webglRef.current = webgl;
     webgl.start();
+
+    if (Common.renderer) {
+      Common.renderer.domElement.style.cssText =
+        "position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; display: block !important;";
+    }
     const io = new IntersectionObserver(
       (entries) => {
         const v = entries[0].isIntersecting;
