@@ -1358,7 +1358,7 @@ export default function App() {
         <div
           style={{
             position: "absolute",
-            inset: 0,
+            inset: "-1px", // 가장자리 픽셀 손실 방지 위해 -1px 여유
             zIndex: 0,
             pointerEvents: "all",
           }}
