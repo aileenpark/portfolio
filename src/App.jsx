@@ -119,9 +119,9 @@ function LiquidEther({
       }
       resize() {
         if (!this.container) return;
-        const rect = this.container.getBoundingClientRect();
-        this.width = Math.max(1, Math.floor(rect.width));
-        this.height = Math.max(1, Math.floor(rect.height));
+        this.width = Math.max(1, Math.floor(window.innerWidth));
+        this.height = Math.max(1, Math.floor(window.innerHeight));
+
         this.aspect = this.width / this.height;
         const isMobile = window.innerWidth < 768;
         this.pixelRatio = isMobile
