@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
@@ -82,7 +82,6 @@ function LiquidEther({
             alpha: true,
           });
         } catch (e) {
-          console.error("WebGLRenderer creation failed in LiquidEther:", e);
           if (onFallback) onFallback();
           return;
         }
@@ -97,7 +96,6 @@ function LiquidEther({
         el.style.position = "absolute";
         el.style.top = "0";
         el.style.left = "0";
-
         el.addEventListener(
           "webglcontextlost",
           (e) => {
@@ -108,12 +106,11 @@ function LiquidEther({
         );
         el.addEventListener(
           "webglcontextcreationerror",
-          (e) => {
+          () => {
             if (onFallback) onFallback();
           },
           false,
         );
-
         this.clock = new THREE.Clock();
         this.clock.start();
       }
@@ -121,7 +118,6 @@ function LiquidEther({
         if (!this.container) return;
         this.width = Math.max(1, Math.floor(window.innerWidth));
         this.height = Math.max(1, Math.floor(window.innerHeight));
-
         this.aspect = this.width / this.height;
         const isMobile = window.innerWidth < 768;
         this.pixelRatio = isMobile
@@ -363,7 +359,6 @@ function LiquidEther({
       }
     }
     const fv = `attribute vec3 position;uniform vec2 px;uniform vec2 boundarySpace;varying vec2 uv;precision highp float;void main(){vec3 pos=position;vec2 scale=1.0-boundarySpace*2.0;pos.xy=pos.xy*scale;uv=vec2(0.5)+(pos.xy)*0.5;gl_Position=vec4(pos,1.0);}`;
-    const lv = `attribute vec3 position;uniform vec2 px;precision highp float;varying vec2 uv;void main(){vec3 pos=position;uv=0.5+pos.xy*0.5;vec2 n=sign(pos.xy);pos.xy=abs(pos.xy)-px*1.0;pos.xy*=n;gl_Position=vec4(pos,1.0);}`;
     const mv = `precision highp float;attribute vec3 position;attribute vec2 uv;uniform vec2 center;uniform vec2 scale;uniform vec2 px;varying vec2 vUv;void main(){vec2 pos=position.xy*scale*2.0*px+center;vUv=uv;gl_Position=vec4(pos,0.0,1.0);}`;
     const af = `precision highp float;uniform sampler2D velocity;uniform float dt;uniform bool isBFECC;uniform vec2 fboSize;uniform vec2 px;varying vec2 uv;void main(){vec2 ratio=max(fboSize.x,fboSize.y)/fboSize;if(isBFECC==false){vec2 vel=texture2D(velocity,uv).xy;vec2 uv2=uv-vel*dt*ratio;vec2 newVel=texture2D(velocity,uv2).xy;gl_FragColor=vec4(newVel,0.0,0.0);}else{vec2 spot_new=uv;vec2 vel_old=texture2D(velocity,uv).xy;vec2 spot_old=spot_new-vel_old*dt*ratio;vec2 vel_new1=texture2D(velocity,spot_old).xy;vec2 spot_new2=spot_old+vel_new1*dt*ratio;vec2 error=spot_new2-spot_new;vec2 spot_new3=spot_new-error/2.0;vec2 vel_2=texture2D(velocity,spot_new3).xy;vec2 spot_old2=spot_new3-vel_2*dt*ratio;vec2 newVel2=texture2D(velocity,spot_old2).xy;gl_FragColor=vec4(newVel2,0.0,0.0);}}`;
     const cf = `precision highp float;uniform sampler2D velocity;uniform sampler2D palette;uniform vec4 bgColor;varying vec2 uv;void main(){vec2 vel=texture2D(velocity,uv).xy;float lenv=clamp(length(vel),0.0,1.0);vec3 c=texture2D(palette,vec2(lenv,0.5)).rgb;vec3 outRGB=mix(bgColor.rgb,c,lenv);float outA=mix(bgColor.a,1.0,lenv);gl_FragColor=vec4(outRGB,outA);}`;
@@ -401,7 +396,7 @@ function LiquidEther({
             vertexShader: fv,
             fragmentShader: af,
             uniforms: {
-              boundarySpace: { value: s.boundarySpace },
+              boundarySpace: { value: s.boundarySpace ?? s.cellScale },
               px: { value: s.cellScale },
               fboSize: { value: s.fboSize },
               velocity: { value: s.src.texture },
@@ -412,9 +407,6 @@ function LiquidEther({
           output: s.dst,
         });
         this.init();
-      }
-      init() {
-        super.init();
       }
       update(args) {
         if (!this.uniforms) return;
@@ -628,6 +620,7 @@ function LiquidEther({
       createShaderPass() {
         this.advection = new Advection({
           cellScale: this.cellScale,
+          boundarySpace: this.cellScale,
           fboSize: this.fboSize,
           dt: this.options.dt,
           src: this.fbos.vel_0,
@@ -766,8 +759,7 @@ function LiquidEther({
         this._loop = this.loop.bind(this);
         this._resize = this.resize.bind(this);
         Common.init(props.$wrapper, props.onFallback);
-        if (!Common.renderer) return; // Initialization failed
-
+        if (!Common.renderer) return;
         Mouse.init(props.$wrapper);
         Mouse.autoIntensity = props.autoIntensity;
         Mouse.takeoverDuration = props.takeoverDuration;
@@ -775,14 +767,12 @@ function LiquidEther({
           this.lastUserInteraction = performance.now();
           if (this.autoDriver) this.autoDriver.forceStop();
         };
-
         this.autoDriver = new AutoDriver(Mouse, this, {
           enabled: props.autoDemo,
           speed: props.autoSpeed,
           resumeDelay: props.autoResumeDelay,
           rampDuration: props.autoRampDuration,
         });
-
         this.init();
         window.addEventListener("resize", this._resize);
         this._onVisibility = () => {
@@ -794,12 +784,9 @@ function LiquidEther({
       init() {
         if (Common.renderer) {
           this.props.$wrapper.prepend(Common.renderer.domElement);
-
-          // prepend 후 바로 강제 스타일 설정
           const el = Common.renderer.domElement;
           el.style.cssText =
             "position: absolute !important; top: 0; left: 0; width: 100%; height: 100%; display: block;";
-
           this.output = new Output();
         }
       }
@@ -860,7 +847,6 @@ function LiquidEther({
       },
     });
 
-    // If WebGLManager failed to init renderer, abort early
     if (!Common.renderer) return;
 
     webglRef.current = webgl;
@@ -870,6 +856,7 @@ function LiquidEther({
       Common.renderer.domElement.style.cssText =
         "position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; display: block !important;";
     }
+
     const io = new IntersectionObserver(
       (entries) => {
         const v = entries[0].isIntersecting;
@@ -883,6 +870,7 @@ function LiquidEther({
     );
     io.observe(mountRef.current);
     intersectionObserverRef.current = io;
+
     const ro = new ResizeObserver(() => {
       if (resizeRafRef.current) cancelAnimationFrame(resizeRafRef.current);
       resizeRafRef.current = requestAnimationFrame(() =>
@@ -891,6 +879,7 @@ function LiquidEther({
     });
     ro.observe(mountRef.current);
     resizeObserverRef.current = ro;
+
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       resizeObserverRef.current?.disconnect();
@@ -928,12 +917,10 @@ function GlassCube() {
     if (!container) return;
     let mounted = true;
 
-    /* ── Renderer ────────────────────────────────────── */
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch (e) {
-      console.error("WebGLRenderer creation failed in GlassCube:", e);
       if (window.handleWebGLFallback) window.handleWebGLFallback();
       return;
     }
@@ -956,10 +943,9 @@ function GlassCube() {
         if (window.handleWebGLFallback) window.handleWebGLFallback();
       }
     };
-    const onContextCreationError = (e) => {
+    const onContextCreationError = () => {
       if (mounted && window.handleWebGLFallback) window.handleWebGLFallback();
     };
-
     renderer.domElement.addEventListener(
       "webglcontextlost",
       onContextLost,
@@ -970,19 +956,15 @@ function GlassCube() {
       onContextCreationError,
       false,
     );
-
     container.appendChild(renderer.domElement);
 
-    /* ── Scene & Camera ──────────────────────────────── */
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
     camera.position.z = 5;
 
-    /* ── Environment map ───────────────────────────────── */
     const pmrem = new THREE.PMREMGenerator(renderer);
     pmrem.compileEquirectangularShader();
 
-    // ① Immediate: synthetic Float32 HDR
     {
       const W = 256,
         H = 128;
@@ -1031,7 +1013,6 @@ function GlassCube() {
       synth.dispose();
     }
 
-    // ② Async: upgrade to a real studio HDR via RGBELoader
     new RGBELoader()
       .loadAsync(
         "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/studio_small_09_1k.hdr",
@@ -1054,7 +1035,6 @@ function GlassCube() {
         if (mounted) pmrem.dispose();
       });
 
-    /* ── Main crystal cube ───────────────────────────── */
     const cubeGeo = new RoundedBoxGeometry(2, 2, 2, 8, 0.22);
     const cubeMat = new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
@@ -1076,7 +1056,6 @@ function GlassCube() {
     cube.scale.set(1.1, 1.1, 1.1);
     scene.add(cube);
 
-    /* ── Inner geometry ──────────────────────────────── */
     const innerGeo = new THREE.OctahedronGeometry(0.52, 2);
     const innerMat = new THREE.MeshPhysicalMaterial({
       color: 0xddc8ff,
@@ -1098,9 +1077,7 @@ function GlassCube() {
     inner.scale.set(1.1, 1.1, 1.1);
     scene.add(inner);
 
-    /* ── Rainbow PointLights ─────────────────────────── */
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-
     const LIGHT_DEFS = [
       { color: 0xff2244, intensity: 25 },
       { color: 0xff8800, intensity: 18 },
@@ -1115,23 +1092,21 @@ function GlassCube() {
       return l;
     });
 
-    /* ── Mouse — velocity-based rotation ─────────────────── */
     let mouseX = 0,
-      mouseY = 0;
-    let prevMouseX = 0,
+      mouseY = 0,
+      prevMouseX = 0,
       prevMouseY = 0;
     let velX = 0,
-      velY = 0;
-    let rotX = 0.18,
+      velY = 0,
+      rotX = 0.18,
       rotY = 0;
-    let autoBlend = 1;
-    let isInWindow = false;
-
-    const SENS = 0.00024;
-    const FRICTION = 0.94;
-    const AUTO_VEL = 0.004;
-    const BLEND_IN = 0.012;
-    const BLEND_OUT = 0.05;
+    let autoBlend = 1,
+      isInWindow = false;
+    const SENS = 0.00024,
+      FRICTION = 0.94,
+      AUTO_VEL = 0.004,
+      BLEND_IN = 0.012,
+      BLEND_OUT = 0.05;
 
     const onMove = (e) => {
       mouseX = e.clientX;
@@ -1144,44 +1119,30 @@ function GlassCube() {
     window.addEventListener("mousemove", onMove);
     document.addEventListener("mouseleave", onLeave);
 
-    /* ── Animation loop ──────────────────────────────── */
     let t = 0,
       rafId;
-
     const animate = () => {
       rafId = requestAnimationFrame(animate);
       t += 0.011;
-
-      const dX = mouseX - prevMouseX;
-      const dY = mouseY - prevMouseY;
+      const dX = mouseX - prevMouseX,
+        dY = mouseY - prevMouseY;
       prevMouseX = mouseX;
       prevMouseY = mouseY;
-
       velY += dX * SENS;
       velX += -dY * SENS * 0.7;
-
       velY = Math.max(-0.12, Math.min(0.12, velY));
       velX = Math.max(-0.08, Math.min(0.08, velX));
-
       velY *= FRICTION;
       velX *= FRICTION;
-
-      if (isInWindow) {
-        autoBlend = Math.max(0, autoBlend - BLEND_OUT);
-      } else {
-        autoBlend = Math.min(1, autoBlend + BLEND_IN);
-      }
-
+      if (isInWindow) autoBlend = Math.max(0, autoBlend - BLEND_OUT);
+      else autoBlend = Math.min(1, autoBlend + BLEND_IN);
       rotY += velY * (1 - autoBlend) + AUTO_VEL * autoBlend;
       rotX += velX * (1 - autoBlend);
-
       cube.rotation.y = rotY;
       cube.rotation.x = rotX;
-
       inner.rotation.y = rotY * 0.7;
       inner.rotation.x = -rotX * 0.65;
       inner.rotation.z = t * 0.22;
-
       lights[0].position.set(
         Math.cos(t * 0.7) * 4.5,
         Math.sin(t * 0.42) * 3.0,
@@ -1212,50 +1173,35 @@ function GlassCube() {
         -2.5,
         Math.cos(t * 0.6 + 2.1) * -3.5,
       );
-
       renderer.render(scene, camera);
     };
     animate();
 
-    /* ── Resize (Desktop 고정 크기 유지 & 반응형 Scale) ─── */
     const handleResize = () => {
       if (!mounted) return;
       const screenW = window.innerWidth;
       const isMobile = screenW < 768;
       const isTablet = screenW >= 768 && screenW < 1280;
-
-      // 1. 모바일 성능 최적화: Pixel Ratio 조정
       renderer.setPixelRatio(
         isMobile
           ? Math.min(window.devicePixelRatio, 1.5)
           : Math.min(window.devicePixelRatio, 2),
       );
-
-      // 2. 렌더링 캔버스 크기는 데스크탑 기준 (616x616)으로 완전 고정하여
-      // 이전과 완벽하게 동일한 픽셀 크기와 위치(top: 40%)를 보장
       renderer.setSize(616, 616, false);
       if (camera.aspect !== 1) {
         camera.aspect = 1;
         camera.updateProjectionMatrix();
       }
-
-      // 3. 브레이크포인트에 따른 CSS Scale 조정
-      // 기준: Desktop 0.8, Tablet 0.8*0.75=0.6, Mobile 0.8*0.5=0.4
       let scale = 0.8;
       if (isMobile) scale = 0.4;
       else if (isTablet) scale = 0.6;
-
       container.style.transform = `translate(-50%, -50%) scale(${scale})`;
-
-      // 물리적 큐브 크기는 원래 비율 그대로 1.1 고정
       cube.scale.set(1.1, 1.1, 1.1);
       inner.scale.set(1.1, 1.1, 1.1);
     };
-
     window.addEventListener("resize", handleResize);
-    handleResize(); // 즉시 1회 실행
+    handleResize();
 
-    /* ── Cleanup ─────────────────────────────────────── */
     return () => {
       mounted = false;
       cancelAnimationFrame(rafId);
@@ -1287,46 +1233,34 @@ function GlassCube() {
       style={{
         position: "absolute",
         top: "32%",
-        left: "50%", // 큐브 세로 위치 32% 조정
+        left: "50%",
         transform: "translate(-50%, -50%)",
         zIndex: 1,
         pointerEvents: "none",
         width: 616,
-        height: 616, // 데스크탑에서 원래 렌더링되던 최적의 픽셀 해상도
+        height: 616,
       }}
     />
   );
 }
 
 /* ══════════════════════════════════════════════════════
-   MAIN APP (Cleaned up)
+   MAIN APP
 ══════════════════════════════════════════════════════ */
 export default function App() {
   const [webglFallback, setWebglFallback] = useState(false);
 
   useEffect(() => {
-    // 1. WebGL Support Detection
     const canvas = document.createElement("canvas");
     let gl = null;
     try {
       gl =
         canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-    } catch (e) {
-      console.warn("WebGL feature detection threw an error:", e);
-    }
+    } catch (e) {}
 
-    if (!gl) {
-      setWebglFallback(true);
-    }
+    if (!gl) setWebglFallback(true);
 
-    // Expose a global fallback handler for child components
-    window.handleWebGLFallback = () => {
-      console.warn(
-        "WebGL fallback triggered from an embedded component or context lost.",
-      );
-      setWebglFallback(true);
-    };
-
+    window.handleWebGLFallback = () => setWebglFallback(true);
     return () => {
       delete window.handleWebGLFallback;
     };
@@ -1342,7 +1276,7 @@ export default function App() {
         background: "#ffffff",
       }}
     >
-      {/* ── WebGL Contents (Hidden if fallback) ── */}
+      {/* WebGL layer */}
       <div
         style={{
           position: "absolute",
@@ -1352,7 +1286,7 @@ export default function App() {
           pointerEvents: webglFallback ? "none" : "auto",
         }}
       >
-        {/* ── Fluid Layer ── */}
+        {/* Fluid background */}
         <div
           style={{
             position: "absolute",
@@ -1376,11 +1310,11 @@ export default function App() {
           />
         </div>
 
-        {/* ── Glass Cube ── */}
+        {/* Glass Cube */}
         <GlassCube />
       </div>
 
-      {/* ── Fallback UI ── */}
+      {/* Fallback UI */}
       {webglFallback && (
         <div
           style={{
