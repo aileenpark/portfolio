@@ -796,6 +796,12 @@ function LiquidEther({
       init() {
         if (Common.renderer) {
           this.props.$wrapper.prepend(Common.renderer.domElement);
+
+          // prepend 후 바로 강제 스타일 설정
+          const el = Common.renderer.domElement;
+          el.style.cssText =
+            "position: absolute !important; top: 0; left: 0; width: 100%; height: 100%; display: block;";
+
           this.output = new Output();
         }
       }
