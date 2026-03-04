@@ -685,9 +685,7 @@ function LiquidEther({
           this.fbos[k].setSize(this.fboSize.x, this.fboSize.y);
       }
       update() {
-        this.boundarySpace.copy(
-          this.options.isBounce ? new THREE.Vector2(0, 0) : this.cellScale,
-        );
+        this.boundarySpace.set(0, 0);
         this.advection.update({
           dt: this.options.dt,
           isBounce: this.options.isBounce,
