@@ -925,7 +925,7 @@ function GlassCube() {
       return;
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(container.offsetWidth, container.offsetHeight);
+    renderer.setSize(container.offsetWidth, container.offsetHeight, false);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1220,7 +1220,7 @@ function GlassCube() {
 
       // 2. 렌더링 캔버스 크기는 데스크탑 기준 (616x616)으로 완전 고정하여
       // 이전과 완벽하게 동일한 픽셀 크기와 위치(top: 40%)를 보장
-      renderer.setSize(616, 616);
+      renderer.setSize(616, 616, false);
       if (camera.aspect !== 1) {
         camera.aspect = 1;
         camera.updateProjectionMatrix();
