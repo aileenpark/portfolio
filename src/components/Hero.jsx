@@ -14,14 +14,17 @@ export default function Hero() {
       <svg
         className="hero-headline"
         viewBox="0 0 1920 103"
+        preserveAspectRatio="xMidYMid meet"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-label="Designed to function"
       >
         <text
+          x="0"
           y="90"
           fontFamily="'Roboto', sans-serif"
           fontWeight="900"
+          fontSize="120"
           fill="#121212"
           textLength="1920"
           lengthAdjust="spacingAndGlyphs"

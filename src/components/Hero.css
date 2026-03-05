@@ -40,10 +40,11 @@
 .hero-headline {
   position: absolute;
   bottom: 15.1%;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   display: block;
   width: 100vw;
-  height: calc(100vw * 103 / 1920);
+  aspect-ratio: 1920 / 103;
   overflow: visible;
 }
 
@@ -82,7 +83,7 @@
 @media (max-width: 768px) {
   .hero-headline {
     width: 100vw;
-    height: calc(100vw * 103 / 1920);
+    aspect-ratio: 1920 / 103;
     bottom: 18%;
   }
 
@@ -108,7 +109,7 @@
 @media (max-width: 375px) {
   .hero-headline {
     width: 100vw;
-    height: calc(100vw * 103 / 1920);
+    aspect-ratio: 1920 / 103;
     bottom: 20%;
   }
 
