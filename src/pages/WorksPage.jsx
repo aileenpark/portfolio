@@ -6,6 +6,7 @@ function useScrollable() {
   useEffect(() => {
     document.documentElement.style.overflow = "auto";
     document.body.style.overflow = "auto";
+    window.scrollTo(0, 0);
     return () => {
       document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
