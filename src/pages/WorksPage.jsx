@@ -6,9 +6,9 @@ function useScrollable() {
   useLayoutEffect(() => {
     document.documentElement.style.overflow = "auto";
     document.body.style.overflow = "auto";
-    const raf = requestAnimationFrame(() => window.scrollTo(0, 0));
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
     return () => {
-      cancelAnimationFrame(raf);
       document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
     };

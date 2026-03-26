@@ -8,7 +8,10 @@ import SunoPage from './pages/SunoPage.jsx'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
-  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  useEffect(() => {
+    document.body.scrollTop = 0
+    document.documentElement.scrollTop = 0
+  }, [pathname])
   return null
 }
 
