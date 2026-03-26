@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 
 function useScrollable() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.documentElement.style.overflow = "auto";
     document.body.style.overflow = "auto";
-    window.scrollTo(0, 0);
+    const raf = requestAnimationFrame(() => window.scrollTo(0, 0));
     return () => {
+      cancelAnimationFrame(raf);
       document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
     };
