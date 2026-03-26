@@ -1,15 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Header.css";
 
 // NOTE: This Figma asset URL expires in 7 days — replace with a permanent SVG file.
 const NP_LOGO =
   "https://www.figma.com/api/mcp/asset/fa6d1b07-b8d1-4df4-b8da-02d8b9302e74";
-
-const NAV_ITEMS = [
-  { label: "Works", href: "#works" },
-  { label: "About", href: "#about" },
-  { label: "Résumé", href: "#resume" },
-];
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -17,16 +12,14 @@ export default function Header() {
   return (
     <header className="header">
       <div className="header-inner">
-        <a href="/" className="header-logo" aria-label="Home">
+        <Link to="/" className="header-logo" aria-label="Home">
           <img src={NP_LOGO} alt="NP" width={36} height={36} />
-        </a>
+        </Link>
 
         <nav className="header-nav" aria-label="Main navigation">
-          {NAV_ITEMS.map(({ label, href }) => (
-            <a key={label} href={href} className="header-nav-item">
-              {label}
-            </a>
-          ))}
+          <Link to="/works" className="header-nav-item">Works</Link>
+          <a href="#about" className="header-nav-item">About</a>
+          <a href="#resume" className="header-nav-item">Résumé</a>
         </nav>
 
         <button
@@ -41,16 +34,9 @@ export default function Header() {
 
       {menuOpen && (
         <nav className="header-mobile-menu" aria-label="Mobile navigation">
-          {NAV_ITEMS.map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              className="header-mobile-nav-item"
-              onClick={() => setMenuOpen(false)}
-            >
-              {label}
-            </a>
-          ))}
+          <Link to="/works" className="header-mobile-nav-item" onClick={() => setMenuOpen(false)}>Works</Link>
+          <a href="#about" className="header-mobile-nav-item" onClick={() => setMenuOpen(false)}>About</a>
+          <a href="#resume" className="header-mobile-nav-item" onClick={() => setMenuOpen(false)}>Résumé</a>
         </nav>
       )}
     </header>
