@@ -1,6 +1,17 @@
 import { useState, useEffect } from "react";
 import Header from "../components/Header";
 
+function useScrollable() {
+  useEffect(() => {
+    document.documentElement.style.overflow = "auto";
+    document.body.style.overflow = "auto";
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    };
+  }, []);
+}
+
 // Design tokens — Semantic (Light mode)
 const C = {
   surfaceDefault: "#FFFFFF",
@@ -53,6 +64,7 @@ const SIDE_NAV_ITEMS = [
 ];
 
 export default function SunoPage() {
+  useScrollable();
   const { hPad, isMobile } = useHPad();
 
   return (

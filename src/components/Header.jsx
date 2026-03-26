@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Header.css";
-
-// NOTE: This Figma asset URL expires in 7 days — replace with a permanent SVG file.
-const NP_LOGO =
-  "https://www.figma.com/api/mcp/asset/fa6d1b07-b8d1-4df4-b8da-02d8b9302e74";
+import logoSrc from "../assets/logo.svg";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,7 +10,7 @@ export default function Header() {
     <header className="header">
       <div className="header-inner">
         <Link to="/" className="header-logo" aria-label="Home">
-          <img src={NP_LOGO} alt="NP" width={36} height={36} />
+          <img src={logoSrc} alt="NP" width={36} height={36} />
         </Link>
 
         <nav className="header-nav" aria-label="Main navigation">

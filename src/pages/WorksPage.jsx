@@ -2,6 +2,17 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 
+function useScrollable() {
+  useEffect(() => {
+    document.documentElement.style.overflow = "auto";
+    document.body.style.overflow = "auto";
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    };
+  }, []);
+}
+
 // Design tokens — Semantic (Light mode)
 const C = {
   surfaceDefault: "#FFFFFF",
@@ -129,6 +140,7 @@ function ArrowIcon() {
 }
 
 export default function WorksPage() {
+  useScrollable();
   const navigate = useNavigate();
   const { hPad, isMobile } = useHPad();
 
